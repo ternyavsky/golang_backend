@@ -39,8 +39,11 @@ func main() {
 	router.GET("/", funcHome)
 	router.GET("/users/:id", getUser)
 	router.POST("/add", pushUser)
-  router.POST("/createtask", createT)
-  router.GET("/task", getT)
+  router.POST("api/task", createT)
+  router.DELETE("api/task", deleteT)
+  router.DELETE("api/task/:id", deleteDetailT)
+  router.PUT("api/task/:id", putDetailT)
+  router.GET("api/task", getT)
   router.GET("/task/:id", getDetailT)
 	router.GET("/items/:id", getDetailItems)
 	router.GET("/items/", getItems)
@@ -48,11 +51,31 @@ func main() {
 	router.Run("localhost:8000")
 
 }
-func createT(c *gin.Context){
-  desc := c.PostForm("description")
-  title := c.PostForm("title")
 
-  a := createTask(title, desc)
+func deleteT(c * gin.Context){
+  deleteTasks()
+}
+
+func putDetailT(c *gin.Context){
+  var newTask Task
+  id := c.Param("id")
+  intId, _:= strconv.Atoi(id)
+  c.BindJSON(&newTask)
+  putDetailTask(intId, newTask.STATUS) } 
+
+
+  func deleteDetailT(c *gin.Context){ 
+    id := c.Param("id") 
+    taskId, _ := strconv.Atoi(id) 
+    deleteDetailTask(taskId)
+  }
+
+func createT(c *gin.Context){
+  var newTask Task
+  c.BindJSON(&newTask)
+  desc := c.PostForm("description")
+  fmt.Println(desc)
+  a := createTask(newTask.TITLE, newTask.DESC, newTask.STATUS)
   c.IndentedJSON(http.StatusOK, a)
 }
 func getT(c *gin.Context){
