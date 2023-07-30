@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
-  _ "github.com/mattn/go-sqlite3"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Task struct {
@@ -34,6 +36,23 @@ func getTasks() []Task{
   return tasks
 }
 
+func getDetailTask(id int) Task{
+  db, err := sql.Open("sqlite3", "todo.db")
+  if err != nil{
+    log.Fatal(err)
+  }
+  defer db.Close()
+  row := db.QueryRow("select * from tasks where id=$1", id)
+  defer db.Close()
+  fmt.Println(id)
+  t := Task{}
+  row.Scan(&t.ID, &t.TITLE, &t.DESC, &t.DATE)
+  fmt.Println(t)
+  return t
+
+}
+
+
 func createTask(title string, description string) Task{
 	db, _ := sql.Open("sqlite3", "todo.db")
 
@@ -44,7 +63,7 @@ func createTask(title string, description string) Task{
   }
  defer db.Close() 
   id, _ := res.LastInsertId()
-  row, err := db.Query("select * from tasks where id=$1", id)
+  row := db.QueryRow("select * from tasks where id=$1", id)
   t := Task{}
   row.Scan(&t.ID, &t.TITLE, &t.DESC, &t.DATE)
   return t

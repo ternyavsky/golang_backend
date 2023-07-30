@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,6 +41,7 @@ func main() {
 	router.POST("/add", pushUser)
   router.POST("/createtask", createT)
   router.GET("/task", getT)
+  router.GET("/task/:id", getDetailT)
 	router.GET("/items/:id", getDetailItems)
 	router.GET("/items/", getItems)
 
@@ -56,6 +59,15 @@ func getT(c *gin.Context){
   a := getTasks()
   c.IndentedJSON(http.StatusOK, a)
 }
+func getDetailT(c *gin.Context){
+  id := c.Param("id")
+  taskId, _:= strconv.Atoi(id)
+  result := getDetailTask(taskId)
+  fmt.Println(result)
+  c.IndentedJSON(http.StatusOK, result)
+
+}
+
 func getItems(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, items)
 }
